@@ -1,0 +1,122 @@
+name: build & test
+
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+
+env:
+  ACCOUNT: ${{ github.repository_owner }}
+  REPOSITORY: ${{ github.event.repository.name }}
+
+
+jobs:
+
+  # ----------- BUILD STAGE ----------- #
+
+  build:
+    runs-on: ubuntu-latest
+    container: docker:git
+    env:
+      OWNER_REPOSITORY: ${{ github.repository }}
+      IMAGE: build
+    steps:
+      - uses: actions/checkout@v3
+      - name: resolve paths-filter error
+        run: |
+          repo=${OWNER_REPOSITORY##*/}
+          git config --global --add safe.directory /__w/${repo}/${repo}
+      - name: detect build file changes
+        uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            buildfiles:
+              - Dockerfile
+              - requirements.txt
+              - tests/requirements-test.txt
+      - name: build & push image to registry
+        if: steps.filter.outputs.buildfiles == 'true'
+        run: |
+          echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u $ACCOUNT --password-stdin
+          docker build -t ghcr.io/${ACCOUNT}/${REPOSITORY}/${IMAGE} .
+          docker push ghcr.io/${ACCOUNT}/${REPOSITORY}/${IMAGE}
+
+
+  # ----------- TESTS ----------- #
+
+  unit-test:
+    runs-on: ubuntu-latest
+    needs: [build]
+    container: 
+      image: ghcr.io/mapattacker/pyspider/build
+      credentials:
+          username: $ACCOUNT
+          password: ${{ secrets.GHCR_TOKEN }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: run tests
+        run: pytest --cov=project/ tests/unit_tests/ -v
+
+        
+  # ----------- SECURITY SCANS ----------- #
+
+  secrets-scan:
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: run secrets scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  sast-scan:
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - uses: actions/checkout@v3
+      - name: run sast scan
+        uses: AppThreat/sast-scan-action@master
+        with:
+          output: reports
+          type: python
+
+  dependency-scan:
+    runs-on: ubuntu-latest
+    needs: [build]
+    container:
+      image: ghcr.io/mapattacker/github-workflow-sample/build
+      credentials:
+          username: $ACCOUNT
+          password: ${{ secrets.GHCR_TOKEN }}
+    steps:
+      - name: run dependency scan
+        run: safety check
+
+  license-scan:
+    runs-on: ubuntu-latest
+    needs: [build]
+    container:
+      image: ghcr.io/mapattacker/github-workflow-sample/build
+      credentials:
+          username: $ACCOUNT
+          password: ${{ secrets.GHCR_TOKEN }}
+    steps:
+      - name: generate consolidated requirements
+        run: pip freeze > requirements-all.txt
+      - name: run license scan
+        id: license_check_report
+        uses: pilosus/action-pip-license-checker@v2
+        with:
+          requirements: 'requirements-all.txt'
+          fail: 'StrongCopyleft,NetworkCopyleft,Other,Error'
+      - name: Print report
+        if: ${{ always() }}
+        run: echo "${{ steps.license_check_report.outputs.report }}"
+    

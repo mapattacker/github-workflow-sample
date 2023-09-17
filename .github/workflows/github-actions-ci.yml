@@ -52,7 +52,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build]
     container: 
-      image: ghcr.io/mapattacker/pyspider/build
+      image: ghcr.io/mapattacker/github-workflow-sample/build
       credentials:
           username: $ACCOUNT
           password: ${{ secrets.GHCR_TOKEN }}

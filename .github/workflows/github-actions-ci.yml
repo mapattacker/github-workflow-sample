@@ -28,9 +28,8 @@ jobs:
       - name: resolve paths-filter error
         run: |
            repo=${OWNER_REPOSITORY##*/}
-           echo ${repo}/${repo}
            # git config --global --add safe.directory /__w/${repo}/${repo}
-           git config --global --add safe.directory /__w/${ACCOUNT}/${REPOSITORY}
+           git config --global --add safe.directory /__w/${REPOSITORY}/${REPOSITORY}
       - name: detect build file changes
         uses: dorny/paths-filter@v2
         id: filter

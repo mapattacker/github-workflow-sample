@@ -21,14 +21,11 @@ jobs:
     runs-on: ubuntu-latest
     container: docker:git
     env:
-      OWNER_REPOSITORY: ${{ github.repository }}
       IMAGE: build
     steps:
       - uses: actions/checkout@v3
       - name: resolve paths-filter error
         run: |
-           repo=${OWNER_REPOSITORY##*/}
-           # git config --global --add safe.directory /__w/${repo}/${repo}
            git config --global --add safe.directory /__w/${REPOSITORY}/${REPOSITORY}
       - name: detect build file changes
         uses: dorny/paths-filter@v2

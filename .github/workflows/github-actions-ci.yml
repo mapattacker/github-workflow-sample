@@ -20,8 +20,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container: docker:git
-    env:
-      IMAGE: build
     permissions:
       contents: read
       packages: write
@@ -41,10 +39,9 @@ jobs:
       - name: build & push image to registry
         # if: steps.filter.outputs.buildfiles == 'true'
         run: |
-          # echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u $ACCOUNT --password-stdin
           echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u $ACCOUNT --password-stdin
-          docker build -t ghcr.io/${ACCOUNT}/${REPOSITORY}/${IMAGE} .
-          docker push ghcr.io/${ACCOUNT}/${REPOSITORY}/${IMAGE}
+          docker build -t ghcr.io/${ACCOUNT}/${REPOSITORY} .
+          docker push ghcr.io/${ACCOUNT}/${REPOSITORY}
 
 
   # ----------- TESTS ----------- #
@@ -95,7 +92,7 @@ jobs:
       contents: read
       packages: read
     container:
-      image: ghcr.io/mapattacker/github-workflow-sample/build
+      image: ghcr.io/mapattacker/github-workflow-sample
       credentials:
           username: $ACCOUNT
           password: ${{ secrets.GITHUB_TOKEN }}
@@ -110,7 +107,7 @@ jobs:
       contents: read
       packages: read
     container:
-      image: ghcr.io/mapattacker/github-workflow-sample/build
+      image: ghcr.io/mapattacker/github-workflow-sample
       credentials:
           username: $ACCOUNT
           password: ${{ secrets.GITHUB_TOKEN }}

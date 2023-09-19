@@ -88,9 +88,9 @@ jobs:
   dependency-scan:
     runs-on: ubuntu-latest
     needs: [build]
-    permissions:
-      contents: read
-      packages: read
+    # permissions:
+    #   contents: read
+    #   packages: read
     container:
       image: ghcr.io/mapattacker/github-workflow-sample
       credentials:
@@ -103,9 +103,9 @@ jobs:
   license-scan:
     runs-on: ubuntu-latest
     needs: [build]
-    permissions:
-      contents: read
-      packages: read
+    # permissions:
+    #   contents: read
+    #   packages: read
     container:
       image: ghcr.io/mapattacker/github-workflow-sample
       credentials:

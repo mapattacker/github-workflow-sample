@@ -23,6 +23,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+  env:
+      IMAGE: ghcr.io/${ACCOUNT}/${REPOSITORY}
     steps:
       - uses: actions/checkout@v3
       - name: resolve paths-filter error
@@ -37,11 +39,11 @@ jobs:
               - requirements.txt
               - tests/requirements-test.txt
       - name: build & push image to registry
-        if: steps.filter.outputs.buildfiles == 'true'
+        # if: steps.filter.outputs.buildfiles == 'true'
         run: |
           echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u $ACCOUNT --password-stdin
-          docker build -t ghcr.io/${ACCOUNT}/${REPOSITORY} .
-          docker push ghcr.io/${ACCOUNT}/${REPOSITORY}
+          docker build -t $IMAGE .
+          docker push $IMAGE
 
 
   # ----------- TESTS ----------- #

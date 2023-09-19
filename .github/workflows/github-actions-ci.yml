@@ -42,11 +42,9 @@ jobs:
         # if: steps.filter.outputs.buildfiles == 'true'
         run: |
           # echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u $ACCOUNT --password-stdin
-          # docker build -t ghcr.io/${ACCOUNT}/${REPOSITORY}/${IMAGE} .
-          # docker push ghcr.io/${ACCOUNT}/${REPOSITORY}/${IMAGE}
           echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u $ACCOUNT --password-stdin
-          docker build -t ghcr.io/${ACCOUNT}/${REPOSITORY} .
-          docker push ghcr.io/${ACCOUNT}/${REPOSITORY}
+          docker build -t ghcr.io/${ACCOUNT}/${REPOSITORY}/${IMAGE} .
+          docker push ghcr.io/${ACCOUNT}/${REPOSITORY}/${IMAGE}
 
 
   # ----------- TESTS ----------- #
@@ -93,11 +91,14 @@ jobs:
   dependency-scan:
     runs-on: ubuntu-latest
     needs: [build]
+    permissions:
+      contents: read
+      packages: read
     container:
       image: ghcr.io/mapattacker/github-workflow-sample/build
       credentials:
           username: $ACCOUNT
-          password: ${{ secrets.GHCR_TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: run dependency scan
         run: safety check
@@ -105,11 +106,14 @@ jobs:
   license-scan:
     runs-on: ubuntu-latest
     needs: [build]
+    permissions:
+      contents: read
+      packages: read
     container:
       image: ghcr.io/mapattacker/github-workflow-sample/build
       credentials:
           username: $ACCOUNT
-          password: ${{ secrets.GHCR_TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: generate consolidated requirements
         run: pip freeze > requirements-all.txt

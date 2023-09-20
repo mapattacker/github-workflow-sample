@@ -7,7 +7,6 @@ RUN apt-get update && apt-get -y upgrade \
     && rm -rf /var/lib/apt/lists/*
 
 # install python requirements
-CMD ls -l
 COPY requirements.txt .
 COPY tests/requirements-test.txt .
 RUN pip3 install --no-cache-dir --upgrade pip \

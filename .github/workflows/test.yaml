@@ -1,11 +1,6 @@
 name: test
 
-on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
-  
+on:  
   workflow_run:
     workflows: ["build"]
     types:

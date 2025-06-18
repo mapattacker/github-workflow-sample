@@ -31,6 +31,7 @@ jobs:
         with:
           filters: |
             buildfiles:
+              - project/*
               - Dockerfile
               - requirements.txt
               - tests/requirements-test.txt

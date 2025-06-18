@@ -6,12 +6,6 @@ on:
      workflows: ["build"]
      types:
        - completed
-       - success
-
-env:
-  ACCOUNT: ${{ github.repository_owner }}
-  REPOSITORY: ${{ github.event.repository.name }}
-
 
 jobs:
 

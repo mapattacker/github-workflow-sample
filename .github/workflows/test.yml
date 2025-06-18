@@ -7,6 +7,10 @@ on:
     types:
       - success
 
+  pull_request:
+    branches:
+      - master
+
 env:
   ACCOUNT: ${{ github.repository_owner }}
   REPOSITORY: ${{ github.event.repository.name }}

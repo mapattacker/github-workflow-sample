@@ -5,11 +5,7 @@ on:
    workflow_run:
     workflows: ["build"]
     types:
-      - success
-
-  pull_request:
-    branches:
-      - master
+      - completed
 
 env:
   ACCOUNT: ${{ github.repository_owner }}

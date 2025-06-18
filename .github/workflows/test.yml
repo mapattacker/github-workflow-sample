@@ -3,10 +3,10 @@ name: test
 
 on:
    workflow_run:
-    workflows: ["build"]
-    types:
-      - completed
-      - success
+     workflows: ["build"]
+     types:
+       - completed
+       - success
 
 env:
   ACCOUNT: ${{ github.repository_owner }}

@@ -1,12 +1,11 @@
-name: build & test
+name: test
 
 
 on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
-
+   workflow_run:
+    workflows: ["Build"]
+    types:
+      - success
 
 env:
   ACCOUNT: ${{ github.repository_owner }}
